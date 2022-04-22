@@ -101,8 +101,12 @@ public class MavenDependencyScanner implements Scanner {
         }
 
         for (String prop : config.properties) {
-            String k = prop.split("=")[0];
-            String v = prop.split("=")[1];
+            String[] kv = prop.split("=");
+            String k = kv[0];
+            String v = "true";
+            if (kv.length == 2) {
+                v = kv[1];
+            }
             properties.setProperty(k, v);
         }
 
@@ -255,17 +259,17 @@ public class MavenDependencyScanner implements Scanner {
         List<String> properties = new LinkedList<String>();
 
         String commandArgs = System.getProperty("sun.java.command");
-        try (java.util.Scanner scanner = new java.util.Scanner(commandArgs).useDelimiter("-")) {
+        try (java.util.Scanner scanner = new java.util.Scanner(commandArgs).useDelimiter(" -")) {
             while (scanner.hasNext()) {
                 String part = scanner.next();
-                if (part.startsWith("gs") || part.startsWith("global-settings")) {
-                    globalSettings = part.replaceFirst("(global-settings|gs)", "").trim();
+                if (part.startsWith("gs") || part.startsWith("-global-settings")) {
+                    globalSettings = part.replaceFirst("(-global-settings|gs)", "").trim();
                     LOGGER.debug("globalSettings from maven cmdLine: " + globalSettings);
-                } else if (part.startsWith("s") || part.startsWith("settings")) {
-                    userSettings = part.replaceFirst("(settings|s)", "").trim();
+                } else if (part.startsWith("s") || part.startsWith("-settings")) {
+                    userSettings = part.replaceFirst("(-settings|s)", "").trim();
                     LOGGER.debug("userSettings from maven cmdLine: " + userSettings);
-                } else if (part.startsWith("D") || part.startsWith("define")) {
-                    properties.add(part.replaceFirst("(define|D)", "").trim());
+                } else if (part.startsWith("D") || part.startsWith("-define")) {
+                    properties.add(part.replaceFirst("(-define|D)", "").trim());
                     LOGGER.debug("property from maven cmdLine: " + properties.get(properties.size() - 1));
                 }
             }

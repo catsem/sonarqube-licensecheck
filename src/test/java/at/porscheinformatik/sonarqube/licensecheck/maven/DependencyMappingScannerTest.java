@@ -105,14 +105,14 @@ public class DependencyMappingScannerTest {
         String oldVal = System.getProperty("sun.java.command");
         try {
             System.setProperty("sun.java.command",
-                    "mvn -B -U sonar:sonar --settings settings.xml -gsglobal.xml -Dusername=developer --define property=prop");
+                    "mvn -B -U sonar:sonar --settings settings.xml -gsglobal.xml -Dusername=developer --define property=my-prop");
 
             MavenConfig config = MavenDependencyScanner.getConfigFromCommandLineArgs();
 
             assertEquals("settings.xml", config.settings.userSettings);
             assertEquals("global.xml", config.settings.globalSettings);
             assertTrue(config.properties.contains("username=developer"));
-            assertTrue(config.properties.contains("property=prop"));
+            assertTrue(config.properties.contains("property=my-prop"));
         } finally {
             System.setProperty("sun.java.command", oldVal);
         }
